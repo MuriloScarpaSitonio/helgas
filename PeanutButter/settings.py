@@ -89,6 +89,11 @@ LOGGING = {
         "console": {
             "class": "logging.StreamHandler",
         },
+        "mail_admins": {
+            "level": "ERROR",
+            "class": "django.utils.log.AdminEmailHandler",
+            "email_backend": "django.core.mail.backends.filebased.EmailBackend",
+        },
     },
     "loggers": {
         "django": {
