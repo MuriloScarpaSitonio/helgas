@@ -1,0 +1,49 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="box-element user-menu mb-5">
+        <i class="fas fa-user mr-1"></i><a href="{% url 'view_profile'%}">Meus
+            dados</a>
+        <hr>
+        <i class="fas fa-shipping-fast mr-1"></i><a href="{% url 'user_page'%}">Meus
+            pedidos</a>
+        <hr>
+        <i class="fas fa-map-marker-alt mr-1"></i><a href="{% url 'view_all_addresses'%}">Meus
+            endereços</a>
+        <hr>
+        <i class="fas fa-reply mr-1"></i><a href="{% url 'logout' %}">Sair</a>
+    </div>
+    <div class="row">
+        <div class="col ml-4">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Endereço</th>
+                        <th scope="col">Tipo de endereço</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for address in addresses %}
+                    <tr>
+                        <td>{{address}}</td>
+                        <td>{{address.main|address_type}}</td>
+                        <td><a href="{% url 'view_address' address.id %}" class="btn btn-outline-dark btn-sm">Alterar
+                                endereço</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-end">
+                <a class="btn btn-lg btn-dark" href="{% url 'register_address' %}">
+                    CADASTRAR NOVO ENDEREÇO
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,84 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="box-element user-menu">
+        <i class="fas fa-user mr-1"></i><a href="{% url 'view_profile'%}">Meus
+            dados</a>
+        <hr>
+        <i class="fas fa-shipping-fast mr-1"></i><a href="{% url 'user_page'%}">Meus
+            pedidos</a>
+        <hr>
+        <i class="fas fa-map-marker-alt mr-1"></i><a href="{% url 'view_all_addresses'%}">Meus
+            endereços</a>
+        <hr>
+        <i class="fas fa-reply mr-1"></i><a href="{% url 'logout' %}">Sair</a>
+    </div>
+    <div class="row">
+        <div class="col ml-4">
+            <table id="list-orders" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Pedido</th>
+                        <th scope="col">Data e hora</th>
+                        <th scope="col">Valor total</th>
+                        <th scope="col">Status</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{order.id}}</td>
+                        <td>{{order.requested_at|date:"d/m/Y H:i:s"}}</td>
+                        <td>R${{order.payment.total|floatformat:2|dot_to_comma}}</td>
+                        <td>{{order.get_status_display}}</td>
+                        <td class="d-flex justify-content-end"><a href="{% url 'view_order' order.id %}"
+                                class="btn btn-outline-dark btn-sm">Ver detalhes</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+
+<script>
+    $.extend($.fn.dataTableExt.oStdClasses, {
+        "sFilterInput": "form-control form-control-sm",
+    });
+
+    $(document).ready(function () {
+        var table = $('#list-orders').DataTable({
+            sPaginationType: 'full_numbers',
+            order: [[1, 'desc']],
+            lengthMenu: [
+                [5, 10, 25, 50, 75, 100, -1],
+                [5, 10, 25, 50, 75, 100, 'Todos']
+            ],
+            language: {
+                info: 'Apresentando _START_ até _END_ de _TOTAL_ pedidos',
+                infoEmpty: 'Apresentando 0 até 0 de 0 pedidos',
+                lengthMenu: 'Apresentar _MENU_ pedidos',
+                emptyTable: 'Nenhuma pedido encontrada',
+                sZeroRecords: 'Nenhuma pedido encontrada',
+                search: '',
+                searchPlaceholder: 'Pesquisar pedido',
+                paginate: {
+                    first: '&#xAB',
+                    previous: '&#x2039;',
+                    next: '&#x203A;',
+                    last: '&#xBB'
+                },
+            },
+        });
+    });
+
+</script>
+
+{% endblock content %}

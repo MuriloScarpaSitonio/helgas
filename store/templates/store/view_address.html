@@ -1,0 +1,83 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="box-element user-menu">
+        <i class="fas fa-user mr-1"></i><a href="{% url 'view_profile'%}">Meus
+            dados</a>
+        <hr>
+        <i class="fas fa-shipping-fast mr-1"></i><a href="{% url 'user_page'%}">Meus
+            pedidos</a>
+        <hr>
+        <i class="fas fa-map-marker-alt mr-1"></i><a href="{% url 'view_all_addresses'%}">Meus
+            endereços</a>
+        <hr>
+        <i class="fas fa-reply mr-1"></i><a href="{% url 'logout' %}">Sair</a>
+    </div>
+    {% if form %}
+    <div class="row">
+        <div class="col ml-4">
+            <h3 class="text-center">ALTERAR ENDEREÇO</h3>
+            <hr>
+            <form method="POST">
+                {% crispy form %}
+                <div class="d-flex justify-content-start mt-1">
+                    <strong>
+                        <p id="zipCodeError" class="hidden mt-n4">CEP
+                            inválido!</p>
+                    </strong>
+                    <div id="i-loader" class="spinner-border hidden mt-n4" role="status"></div>
+                    <small id="zipCodeLoadingText" class="hidden mt-n3 ml-2">Obtendo informações do CEP...</small>
+                </div>
+                <div class="d-flex justify-content-between mt-n3" id="buttons">
+                    <button class="btn btn-lg btn-danger" type="button" onclick="removeAddress({{address_id}})">
+                        REMOVER ENDEREÇO
+                    </button>
+                    <button class="btn btn-lg btn-dark" type="submit">
+                        ALTERAR ENDEREÇO
+                    </button>
+                </div>
+            </form>
+            <div class="mt-6">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible text-center" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div id="no-order" class="text-center">
+        <h1>O endereço não existe para o cliente selecionado!</h1>
+    </div>
+    {% endif %}
+</div>
+
+<script type="module" src="{% static 'js/userPageZipCodeInfos.js' %}"></script>
+<script type="text/javascript">
+    function removeAddress(addressId) {
+        fetch('/remove_address/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({ addressId })
+        })
+            .then((response) => {
+                return response.json()
+            })
+            .then((data) => {
+                location.href = "{% url 'view_all_addresses' %}"
+            })
+    }
+</script>
+
+{% endblock content %}

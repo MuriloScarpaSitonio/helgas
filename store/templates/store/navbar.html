@@ -1,0 +1,134 @@
+{% load static %}
+{% load custom_filters %}
+{% load crispy_forms_tags %}
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css"
+        integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
+
+</head>
+
+<style>
+    .dropdown-menu {
+        min-width: 19rem;
+    }
+</style>
+
+<nav class="navbar sticky-top navbar-expand-lg navbar-light bg-white">
+    <a class="navbar-brand" href="{% url 'store' %}">Helga's</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'store' %}"> <span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        <div class="form-inline">
+            {% if request.user.is_authenticated %}
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" data-target="#user-infos">
+                        <i class="fas fa-user"></i> {{request.user}} </a>
+                    <div id="user-infos" class="dropdown-menu dropdown-menu-left dropdown-info"
+                        aria-labelledby="navbarDropdownMenuLink-4">
+                        <a class="dropdown-item" href="{% url 'user_page'%}">Meus pedidos</a>
+                        <a class="dropdown-item" href="{% url 'view_profile'%}">Meus dados</a>
+                        <a class="dropdown-item" href="{% url 'view_all_addresses'%}">Meus endereços</a>
+                        <a class="dropdown-item" href="{% url 'logout' %}">Sair</a>
+                    </div>
+                </li>
+            </ul>
+            {% else %}
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" data-target="#user-infos">
+                        <i class="fas fa-user"></i> Entrar</a>
+                    <div id="user-infos" class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="{% url 'login' %}">Login</a>
+                        <a class="dropdown-item" href="{% url 'register' %}">Cadastre-se</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        {% endif %}
+
+        <a href="#" id="navbarDropdownCart" data-toggle="dropdown" data-target="#cart-items">
+            <img id="cart-icon" src="{% static 'images/cart.png' %}"></a>
+        <p id="cart-total">{{order.cart_items}}</p>
+
+        <div id="cart-items" class="dropdown-menu dropdown-menu-right scrollable-menu"
+            aria-labelledby="navbarDropdownCart">
+            {% if items %}
+            <table class="table table-striped">
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td><a href="{% url 'view_product' item.product.id %}"><img class="row-img"
+                                    src="{{item.product.image_url}}"></a></td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <div><strong>{{item.product.name}}</strong></div>
+                                <div>
+                                    <h5 class="text-success">
+                                        R${{item.product.price|floatformat:2|dot_to_comma}}
+                                    </h5>
+                                    <h6>Quantidade: {{item.quantity}}</h6>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="quantity">
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <button class="btn btn-outline-secondary update-cart" type="button"
+                                            data-product="{{item.product.id}}"
+                                            data-action="subtract"><strong>-</strong></button>
+                                    </div>
+                                    <input type="text" inputmode="decimal" class="form-control text-center"
+                                        value="{{item.quantity}}" readonly />
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary update-cart" type="button"
+                                            data-product="{{item.product.id}}"
+                                            data-action="add"><strong>+</strong></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <button class="btn btn-sm btn-outline-danger"
+                                    onclick="removeItem({{item.product.id}})">Remover item</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="dropdown-divider"></div>
+            <div class="d-flex justify-content-between">
+                <div class="ml-3 mt-2">
+                    <h5>Total: <strong>R${{order.cart_total|floatformat:2|dot_to_comma}}</strong></h5>
+                </div>
+                <div class="mr-3"><a class="btn btn-outline-dark" href="{% url 'cart' %}" role="button">Ver
+                        carrinho</a>
+                </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <div class="container d-flex justify-content-center">
+                <a class="btn btn-block btn-lg btn-success" href="{% url 'checkout' %}">
+                    FECHAR PEDIDO
+                </a>
+            </div>
+            {% else %}
+            <div class="p-3">
+                <h4>O carrinho está vazio!</h4>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    </div>
+    </div>
+</nav>

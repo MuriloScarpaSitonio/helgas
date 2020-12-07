@@ -1,0 +1,161 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+
+
+<div class="container-fluid">
+    <div class="box-element user-menu">
+        <i class="fas fa-user mr-1"></i><a href="{% url 'view_profile'%}">Meus
+            dados</a>
+        <hr>
+        <i class="fas fa-shipping-fast mr-1"></i><a href="{% url 'user_page'%}">Meus
+            pedidos</a>
+        <hr>
+        <i class="fas fa-map-marker-alt mr-1"></i><a href="{% url 'view_all_addresses'%}">Meus
+            endereços</a>
+        <hr>
+        <i class="fas fa-reply mr-1"></i><a href="{% url 'logout' %}">Sair</a>
+    </div>
+    {% if requested_order and requested_order.payment %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col ml-3 mb-3">
+                <h3 class="text-center">Status do pedido</h3>
+                <hr>
+                <div id="steps" class="d-flex justify-content-around mb-1">
+                    <div id="requested" class="step">
+                        <i class="fas fa-check fa-2x"></i>
+                        <h6 class="fs-85">Pedido realizado</h6>
+                    </div>
+                    <div id="payed" class="step">
+                        <i class="fas fa-dollar-sign fa-2x"></i>
+                        <h6 class="fs-85">Pagamento confirmado</h6>
+                    </div>
+                    <div id="preparing" class="step">
+                        <i class="fas fa-dolly-flatbed fa-2x"></i>
+                        <h6 class="fs-85">Preparando para envio</h6>
+                    </div>
+                    <div id="shipped" class="step">
+                        <i class="fas fa-shipping-fast fa-2x"></i>
+                        <h6 class="fs-85">Pedido enviado</h6>
+                    </div>
+                </div>
+                <div class="progress mb-3">
+                    <div id="progressBar" class="progress-bar bg-success" role="progressbar"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-around">
+            <div class="col-md-4 gboro-border">
+                <h5 class="text-center">Resumo do pedido</h5>
+                <hr>
+                {% for item in requested_items %}
+                <div class="row p-1">
+                    <div class="col-sm-4">
+                        <a href="{% url 'view_product' item.product.id %}"><img class="row-img"
+                                src="{{item.product.image_url}}"></a>
+                    </div>
+                    <div class="col-sm-8">
+                        <strong>{{item.product.name}}</strong>
+                        <h6 class="mb-0 mt-2">Preço: R${{item.product.price|floatformat:2|dot_to_comma}}
+                        </h6>
+                        <h6 class="mb-0">Quantidade: {{item.quantity}}</h6>
+                        <h6 class="mb-0">Total item: R${{item.total|floatformat:2|dot_to_comma}}</h6>
+                    </div>
+                </div>
+                {% endfor %}
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <div class="d-flex flex-column">
+                        <h6>Subotal: <strong>R${{requested_order.cart_total|floatformat:2|dot_to_comma}}</strong></h6>
+                        <h6>Desconto: <strong>R${{requested_order.discount|floatformat:2|dot_to_comma}}</strong></h6>
+                        <h6>Juros: <strong>R${{requested_order.interests|floatformat:2|dot_to_comma}}</strong></h6>
+                        <h6>Frete: <strong>R${{requested_order.shipping_price|floatformat:2|dot_to_comma}}</strong></h6>
+                    </div>
+                    <div>
+                        <h5>Total:
+                            <strong>R${{requested_order.payment.total|floatformat:2|dot_to_comma}}</strong></h5>
+                    </div>
+                </div>
+            </div>
+            <div id="payment" class="col-md-3 ml-3 gboro-border">
+                <div class="text-center">
+                    <h5>Forma de pagamento</h5>
+                </div>
+                <hr>
+                <p class="mb-0"><strong>{{requested_order.payment.get_payment_type_display}}</strong></p>
+                <p>em {{requested_order.payment.number_of_installments}}x de
+                    R${{requested_order.payment.value_of_installment|floatformat:2|dot_to_comma}}</p>
+                <hr>
+                {% if requested_order.payment_type == "bank_slip" and requested_order.status == 'requested' %}
+                <button id="bank-slip" class="btn btn-outline-dark btn-block hidden">Ver boleto</button>
+                <!--TODO: Add bank slip-->
+                {% endif %}
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-12 gboro-border">
+                        <div class="text-center">
+                            <h5>Rastrear pedido</h5>
+                        </div>
+                        <hr>
+                        <div>
+                            <p>Código: {{requested_order.shipping_tracking_code}}</p>
+                            <hr>
+                            <p>Previsão de entrega: <strong>{{requested_order.shipping_service.days_to_deliver}} dias
+                                    úteis</strong>
+                                após a
+                                postagem da encomenda</h6>
+                            </p>
+                            <hr>
+                            <a class="btn btn-outline-dark btn-block mb-1" target="_blank" rel="noopener noreferrer"
+                                href="https://www2.correios.com.br/sistemas/rastreamento/default.cfm">
+                                RASTREAR PEDIDO</a>
+                        </div>
+                    </div>
+                    <div class="col-md-12 mt-3 gboro-border">
+                        <div class="text-center">
+                            <h5>Endereço de entrega</h5>
+                        </div>
+                        <hr>
+                        {{requested_order.shipping_address}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center no-order">
+        <h1>A ordem não existe para o cliente selecionado!</h1>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    var order_status = "{{requested_order.status}}"
+
+    function setProgressBarWidth(order_status) {
+        if (order_status == "requested") {
+            return "w-25"
+        }
+        if (order_status == "payed") {
+            return "w-50"
+        }
+        if (order_status == "preparing") {
+            return "w-75"
+        }
+        if (order_status == "shipped") {
+            return "w-100"
+        }
+    }
+    document.getElementById("progressBar").classList.add(setProgressBarWidth(order_status))
+    $("#steps").children("div").each(function () {
+        $(this).addClass("active")
+        if (order_status == this.id) {
+            return false
+        }
+    })
+</script>
+
+{% endblock content %}

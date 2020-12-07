@@ -1,0 +1,161 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="box-element">
+            <a class="btn btn-outline-dark" href="{% url 'store' %}">&#x2190; Continue comprando</a>
+            <br>
+            <br>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Item</th>
+                        <th scope="col">Preço</th>
+                        <th scope="col">Quantidade</th>
+                        <th scope="col">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td><a href="{% url 'view_product' item.product.id %}"><img class="row-img"
+                                    src="{{item.product.image_url}}"></a></td>
+                        <td>
+                            <h5>{{item.product.name}}</h5>
+                        </td>
+                        <td>
+                            <h5>R${{item.product.price|floatformat:2|dot_to_comma}}</h5>
+                        </td>
+                        <td>
+                            <div class="quantity">
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <button class="btn btn-outline-secondary update-cart" type="button"
+                                            data-product="{{item.product.id}}"
+                                            data-action="subtract"><strong>-</strong></button>
+                                    </div>
+                                    <input type="text" class="form-control text-center" value="{{item.quantity}}"
+                                        readonly />
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary update-cart" type="button"
+                                            data-product="{{item.product.id}}"
+                                            data-action="add"><strong>+</strong></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <button class="btn btn-sm btn-outline-danger"
+                                    onclick="removeItem({{item.product.id}})">Remover item</button>
+                            </div>
+                        </td>
+                        <td>
+                            <h5>R${{item.total|floatformat:2|dot_to_comma}}</h5>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <h5>Itens: <strong>{{order.cart_items}}</strong></h5>
+                    </td>
+                    <td>
+                        <h5>Total: <strong>R${{order.cart_total|floatformat:2|dot_to_comma}}</strong></h5>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="d-flex justify-content-between">
+            <div class="mt-2">
+                <h6>Calcular frete e prazo:</h6>
+                <form onsubmit="return false">
+                    <div class="form-inline">
+                        <input id="zip_code" class="form-control-sm form-control" type="text" placeholder="CEP"
+                            data-mask="00000-000">
+                        <button id="get_shipping_infos" class="btn btn-dark btn-sm ml-2" type="submit">Calcular</button>
+                    </div>
+                </form>
+                <table class="table table-striped hidden" id="tableShippingInfos">
+                    <thead>
+                        <tr>
+                            <th scope="col">Serviço</th>
+                            <th scope="col">Preço</th>
+                            <th scope="col">Prazo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>PAC</td>
+                            <td id="price_04510"></td>
+                            <td id="deadline_04510"></td>
+                        </tr>
+                        <tr>
+                            <td>SEDEX</td>
+                            <td id="price_04014"></td>
+                            <td id="deadline_04014"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="d-flex justify-content-start mt-2">
+                    <div id="i-loader-shipping-service" class="spinner-border hidden" role="status">
+                    </div>
+                    <small id="shippingInfosLoadingText" class="ml-2 hidden">Obtendo informações de
+                        envio...</small>
+                    <strong>
+                        <p id="shippingInfosError" class="hidden"></p>
+                    </strong>
+                </div>
+            </div>
+            <div>
+                <a class="btn btn-lg btn-success mt-2" href="{% url 'checkout' %}">
+                    FECHAR PEDIDO
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { getShippingInfos, getZipCodeError } from "{% static 'js/utils.js' %}"
+
+    $("#get_shipping_infos").click(function () {
+        var shipping_loader = document.getElementById('i-loader-shipping-service')
+        var shipping_text = document.getElementById('shippingInfosLoadingText')
+        var shipping_error_text = document.getElementById('shippingInfosError')
+
+        shipping_loader.classList.remove('hidden')
+        shipping_text.classList.remove('hidden')
+        shipping_error_text.classList.add('hidden')
+
+        getShippingInfos($("#zip_code").val().replace(/\D/g, ''))
+            .then((shipping_infos) => {
+                shipping_loader.classList.add('hidden')
+                shipping_text.classList.add('hidden')
+                if (shipping_infos.PAC.Erro == 0) {
+                    document.getElementById('price_04510').innerHTML = 'R$' + shipping_infos.PAC.Valor
+                    document.getElementById('deadline_04510').innerHTML = shipping_infos.PAC.PrazoEntrega + ' dias úteis'
+
+                    document.getElementById('price_04014').innerHTML = 'R$' + shipping_infos.SEDEX.Valor
+                    document.getElementById('deadline_04014').innerHTML = shipping_infos.SEDEX.PrazoEntrega + ' dias úteis'
+
+                    document.getElementById("tableShippingInfos").classList.remove('hidden')
+                }
+                else {
+                    document.getElementById("tableShippingInfos").classList.add('hidden')
+                    shipping_error_text.innerHTML = getZipCodeError(shipping_infos.PAC.Erro, shipping_infos.PAC.MsgErro)
+                    shipping_error_text.classList.remove('hidden')
+                }
+            })
+    })
+
+</script>
+
+
+{% endblock content %}

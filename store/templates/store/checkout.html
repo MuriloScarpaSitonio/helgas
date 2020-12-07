@@ -1,0 +1,365 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% load custom_filters %}
+{% load crispy_forms_tags %}
+{% load socialaccount %}
+{% providers_media_js %}
+{% block content %}
+
+<style>
+	button[type="button"] {
+		color: rgb(100, 100, 100)
+	}
+</style>
+
+<div class="container-fluid">
+	<div class="text-center">
+		<button class="btn btn-link btn-sm" type="button" data-toggle="collapse" data-target="#collapseProducts"
+			aria-expanded="false" aria-controls="collapseProducts">
+			<strong>
+				<h2>Resumo do pedido &#8628;</h2>
+			</strong>
+		</button>
+	</div>
+	<div class="row justify-content-center">
+		<div class="box-element w-25 collapse" id="collapseProducts">
+			{% for item in items %}
+			<hr>
+			<div class="col">
+				<div class="d-flex justify-content-start">
+					<div>
+						<a href="{% url 'view_product' item.product.id %}"><img class="row-img"
+								src="{{item.product.image_url}}"></a>
+					</div>
+					<div class="ml-1">
+						<strong>{{item.product.name}}</strong>
+						<p class="mb-0">Quantidade: {{item.quantity}}</p>
+						<p class="mb-0">Preço: R${{item.product.price|floatformat:2|dot_to_comma}}</p>
+						<p class="mb-0">Total item: R${{item.total|floatformat:2|dot_to_comma}}</p>
+					</div>
+				</div>
+			</div>
+			{% endfor %}
+			<hr>
+			<div class="d-flex justify-content-between">
+				<div class="d-flex align-items-center">
+					<a class="btn btn-outline-dark btn-sm" href="{% url 'cart' %}">&#x2190; Voltar ao carrinho</a>
+				</div>
+				<div>
+					<h5 class="text-center">Total:
+						<strong>R${{order.cart_total|floatformat:2|dot_to_comma}}</strong></h5>
+					<h6>Em até 6x sem juros</h6>
+				</div>
+			</div>
+		</div>
+	</div>
+	<hr>
+	<br>
+	<div class="text-center">
+		<button class="btn btn-link btn-sm" type="button" data-toggle="collapse" data-target="#collapseForms"
+			aria-expanded="false" aria-controls="collapseForms">
+			<strong>
+				<h2>Registre-se &#8628;</h2>
+			</strong>
+		</button>
+		<hr>
+		<div class="collapse show" id="collapseForms">
+			<form method="POST">
+				{% csrf_token %}
+				<div class="row">
+					<div class="col-lg-4">
+						<div class="box-element">
+							<h3 class="text-center">Novo cadastro, faça <a href="{% url 'login' %}">login</a> ou entre
+								com rede social
+							</h3>
+							<hr>
+							<div class="d-flex justify-content-around">
+								<a class="btn btn-primary btn-sm"
+									href="{% provider_login_url "facebook" method="oauth2" %}"><i
+										class="fab fa-facebook-f mr-2"></i>Entrar com Facebook</a>
+								<a class="btn btn-danger btn-sm" href="{% url 'google_login' %}"><i
+										class="fab fa-google mr-2"></i>Entrar com
+									Google</a>
+							</div>
+							<hr>
+							{% crispy user_form %}
+							{% crispy customer_form %}
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="box-element">
+							<h3 class="text-center">Informações de envio</h3>
+							<hr>
+							<div class="form-row">
+								<div class="form-group col-md-4">
+									{{ shipping_form.zip_code|as_crispy_field }}
+								</div>
+								<div class="form-group col-md-8">
+									<table class="table table-sm table-striped hidden" id="tableShippingInfos">
+										<thead>
+											<tr>
+												<th scope="col">Serviço</th>
+												<th scope="col">Preço</th>
+												<th scope="col">Prazo</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>
+													<div class="radio">
+														<label><input type="radio"
+																id="shipping_services_form-service_04510"
+																name="shipping_services_form-service" required=""
+																value="04510">
+															PAC
+														</label>
+													</div>
+												</td>
+												<td id="price_04510"></td>
+												<td id="deadline_04510"></td>
+											</tr>
+											<tr>
+												<td>
+													<div class="radio">
+														<label><input type="radio"
+																id="shipping_services_form-service_04014"
+																name="shipping_services_form-service" required=""
+																value="04014">
+															SEDEX
+														</label>
+													</div>
+												</td>
+												<td id="price_04014"></td>
+												<td id="deadline_04014"></td>
+											</tr>
+										</tbody>
+									</table>
+									<div class="d-flex justify-content-start">
+										<div id="i-loader-shipping-service" class="spinner-border hidden" role="status">
+										</div>
+										<small id="shippingInfosLoadingText" class="ml-2 hidden">Obtendo informações de
+											envio...</small>
+										<strong>
+											<p id="shippingInfosError" class="hidden"></p>
+										</strong>
+									</div>
+								</div>
+							</div>
+							<div class="form-row hidden" id="address-number-row">
+								<div class="form-group col-md-9">
+									{{ shipping_form.address|as_crispy_field }}
+								</div>
+								<div class="form-group col-md-3">
+									{{ shipping_form.number|as_crispy_field }}
+								</div>
+							</div>
+							<div class="form-row hidden" id="complement-reference-row">
+								<div class="form-group col-md-6">
+									{{ shipping_form.complement|as_crispy_field }}
+								</div>
+								<div class="form-group col-md-6">
+									{{ shipping_form.reference|as_crispy_field }}
+								</div>
+							</div>
+							<div class="form-row hidden" id="neighborhood-city-row">
+								<div class="form-group col-md-6">
+									{{ shipping_form.neighborhood|as_crispy_field }}
+								</div>
+								<div class="form-group col-md-6">
+									{{ shipping_form.city|as_crispy_field }}
+								</div>
+							</div>
+							<div class="form-row hidden" id="uf-country-row">
+								<div class="form-group col-md-6">
+									{{ shipping_form.uf|as_crispy_field }}
+								</div>
+								<div class="form-group col-md-6">
+									{{ shipping_form.country|as_crispy_field }}
+								</div>
+							</div>
+							<div class="d-flex justify-content-start">
+								<div id="i-loader" class="spinner-border hidden mt-n4" role="status"></div>
+								<small id="zipCodeLoadingText" class="hidden mt-n3 ml-2">Obtendo informações do
+									CEP...</small>
+								<strong>
+									<p id="zipCodeError" class="hidden mt-n4">CEP
+										inválido!</p>
+								</strong>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="box-element">
+							<h3 class="text-center">Forma de pagamento</h3>
+							<hr>
+							<div class="container" id="accordion"
+								data-installments-url="{% url 'load_credit_card_installments' %}">
+								<div class="d-flex justify-content-between">
+									<div>
+										<input type="radio" name="payment_form-payment_type"
+											id="id_payment_form-payment_type_0"
+											value="{{payment_form.payment_type_choices.0.0}}" required=""
+											data-toggle="collapse" data-target="#collapseInstallments"
+											onclick="ensureCorrectValue()">
+										<label>
+											<h6>{{payment_form.payment_type_choices.0.1}}</h6>
+										</label>
+									</div>
+									<div class="mt-n1">
+										<i class="fab fa-cc-visa fa-2x"></i>
+										<i class="fab fa-cc-mastercard fa-2x ml-1"></i>
+										<i class="fab fa-cc-amex fa-2x ml-1"></i>
+									</div>
+								</div>
+								<div class="collapse" id="collapseInstallments" data-parent="#accordion">
+									{% crispy credit_card_form %}
+								</div>
+								<div class="d-flex justify-content-between">
+									<div>
+										<input type="radio" name="payment_form-payment_type"
+											id="id_payment_form-payment_type_1"
+											value="{{payment_form.payment_type_choices.1.0}}" required=""
+											data-toggle="collapse" data-target="#collapseNonePayPal"
+											onclick="ensureCorrectValue()">
+										<label>
+											<h6>{{payment_form.payment_type_choices.1.1}}</h6>
+										</label>
+									</div>
+									<div class="mt-n1">
+										<i class="fab fa-cc-paypal fa-2x"></i>
+									</div>
+									<div class="collapse hidden" id="collapseNonePayPal" data-parent="#accordion"></div>
+								</div>
+								<div class="d-flex justify-content-between">
+									<div>
+										<input type="radio" name="payment_form-payment_type"
+											id="id_payment_form-payment_type_2"
+											value="{{payment_form.payment_type_choices.2.0}}" required=""
+											data-toggle="collapse" data-target="#collapseNoneBankSlip"
+											onclick="showDiscontedValue()">
+										<label>
+											<h6>{{payment_form.payment_type_choices.2.1}} (10% de desconto)</h6>
+										</label>
+									</div>
+									<div>
+										<img class="h-100 ml-n38 mt-n1"
+											src="https://img.icons8.com/color/48/000000/boleto-bankario.png" />
+									</div>
+									<div class="collapse hidden" id="collapseNoneBankSlip" data-parent="#accordion">
+									</div>
+								</div>
+								<div id="total" class="d-flex justify-content-end mt-4">
+									<div>
+										<h4>
+											Total: <strong
+												id="total_text">R${{order.cart_total|floatformat:2|dot_to_comma}}</strong>
+										</h4>
+									</div>
+								</div>
+								<div id="total-discounted" class="d-flex justify-content-end mt-4 hidden">
+									<div>
+										<h4>
+											Total:
+											<strong
+												id="total-discounted_text">R${{order.cart_total|bank_slip_discount|floatformat:2|dot_to_comma}}</strong>
+										</h4>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="d-flex justify-content-end">
+							<button class="btn btn-success btn-lg mt-2" type="submit">
+								Finalizar pedido
+							</button>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<div class="d-flex justify-content-end">
+	<a class="bank-slip-link" href="https://icons8.com/icon/77599/boleto-bankario" target="_blank"
+		rel="noopener noreferrer">
+		Boleto Bankario icon by Icons8
+	</a>
+</div>
+
+<script type="text/javascript" src="{% static 'js/processTotalValueDisplay.js' %}"
+	data-cart_total="{{order.cart_total}}" data-cash_total="{{order.cash_total}}"></script>
+<script type="module">
+	import { getZipCodeInfos, getShippingInfos, getZipCodeError } from "{% static 'js/utils.js' %}"
+
+	$("#id_shipping_form-zip_code").keyup(function () {
+		if ($(this).val().length == 9) {
+			var loader = document.getElementById('i-loader')
+			var loading_text = document.getElementById('zipCodeLoadingText')
+			var error_text = document.getElementById('zipCodeError')
+
+			loader.classList.remove('hidden')
+			loading_text.classList.remove('hidden')
+			error_text.classList.add('hidden')
+
+			getZipCodeInfos($(this).val().replace(/\D/g, ''))
+				.then((zip_code_infos) => {
+					if (zip_code_infos.erro == undefined) {
+						loader.classList.add('hidden')
+						loading_text.classList.add('hidden')
+
+						var shipping_loader = document.getElementById('i-loader-shipping-service')
+						var shipping_text = document.getElementById('shippingInfosLoadingText')
+						var shipping_error_text = document.getElementById('shippingInfosError')
+
+						shipping_loader.classList.remove('hidden')
+						shipping_text.classList.remove('hidden')
+						shipping_error_text.classList.add('hidden')
+
+						document.getElementById("id_shipping_form-address").setAttribute("value", zip_code_infos.logradouro)
+						document.getElementById("id_shipping_form-neighborhood").setAttribute("value", zip_code_infos.bairro)
+						document.getElementById("id_shipping_form-complement").setAttribute("value", zip_code_infos.complemento)
+						document.getElementById("id_shipping_form-city").setAttribute("value", zip_code_infos.localidade)
+						var options = document.getElementById("id_shipping_form-uf").options
+						for (var i = 0; i < options.length; i++) {
+							if (options[i].value == zip_code_infos.uf) {
+								options[i].selected = true
+							}
+						}
+						$('#id_shipping_form-uf option:not(:selected)').prop('disabled', true);
+
+						getShippingInfos(zip_code_infos.cep)
+							.then((shipping_infos) => {
+								shipping_loader.classList.add('hidden')
+								shipping_text.classList.add('hidden')
+								if (shipping_infos.PAC.Erro == 0) {
+									document.getElementById('price_04510').innerHTML = 'R$' + shipping_infos.PAC.Valor
+									document.getElementById('deadline_04510').innerHTML = shipping_infos.PAC.PrazoEntrega + ' dias úteis'
+
+									document.getElementById('price_04014').innerHTML = 'R$' + shipping_infos.SEDEX.Valor
+									document.getElementById('deadline_04014').innerHTML = shipping_infos.SEDEX.PrazoEntrega + ' dias úteis'
+
+									document.getElementById("tableShippingInfos").classList.remove('hidden')
+								}
+								else {
+									shipping_error_text.innerHTML = getZipCodeError(shipping_infos.PAC.Erro, shipping_infos.PAC.MsgErro)
+									shipping_error_text.classList.remove('hidden')
+								}
+							})
+
+						document.getElementById("address-number-row").classList.remove('hidden')
+						document.getElementById("complement-reference-row").classList.remove('hidden')
+						document.getElementById("neighborhood-city-row").classList.remove('hidden')
+						document.getElementById("uf-country-row").classList.remove('hidden')
+					}
+					else {
+						loader.classList.add('hidden')
+						loading_text.classList.add('hidden')
+						error_text.classList.remove('hidden')
+					}
+				})
+		}
+	})
+
+</script>
+
+
+{% endblock content %}

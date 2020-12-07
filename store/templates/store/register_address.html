@@ -1,0 +1,47 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+
+<div class="container-fluid">
+    <div class="box-element user-menu">
+        <i class="fas fa-user mr-1"></i><a href="{% url 'view_profile'%}">Meus
+            dados</a>
+        <hr>
+        <i class="fas fa-shipping-fast mr-1"></i><a href="{% url 'user_page'%}">Meus
+            pedidos</a>
+        <hr>
+        <i class="fas fa-map-marker-alt mr-1"></i><a href="{% url 'view_all_addresses'%}">Meus
+            endereços</a>
+        <hr>
+        <i class="fas fa-reply mr-1"></i><a href="{% url 'logout' %}">Sair</a>
+    </div>
+    <div class="row">
+        <div class="col ml-4">
+            <h3 class="text-center">CADASTRAR ENDEREÇO</h3>
+            <hr>
+            <form method="POST">
+                {% csrf_token %}
+                {% crispy form %}
+                <div class="d-flex justify-content-start mt-1">
+                    <strong>
+                        <p id="zipCodeError" class="hidden mt-n4">CEP
+                            inválido!</p>
+                    </strong>
+                    <div id="i-loader" class="spinner-border hidden mt-n4" role="status"></div>
+                    <small id="zipCodeLoadingText" class="hidden mt-n3 ml-2">Obtendo informações do CEP...</small>
+                </div>
+                <div class="d-flex justify-content-end mt-n3" id="buttons">
+                    <button id="submit-button" class="btn btn-lg btn-dark" type="submit">
+                        CADASTRAR ENDEREÇO
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="{% static 'js/userPageZipCodeInfos.js' %}"></script>
+
+{% endblock content %}

@@ -1,0 +1,57 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="box-element user-menu">
+        <i class="fas fa-user mr-1"></i><a href="{% url 'view_profile'%}">Meus
+            dados</a>
+        <hr>
+        <i class="fas fa-shipping-fast mr-1"></i><a href="{% url 'user_page'%}">Meus
+            pedidos</a>
+        <hr>
+        <i class="fas fa-map-marker-alt mr-1"></i><a href="{% url 'view_all_addresses'%}">Meus
+            endereços</a>
+        <hr>
+        <i class="fas fa-reply mr-1"></i><a href="{% url 'logout' %}">Sair</a>
+    </div>
+    <div class="row justify-content-between">
+        <div class="col ml-3">
+            <h4 class="text-center">MEUS DADOS</h4>
+            <hr>
+            {% crispy form %}
+            <div class="mt-4">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible text-center" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="col">
+            <h4 class="text-center">MEUS ENDEREÇOS</h4>
+            <hr>
+            <table class="table table-striped">
+                {% for address in addresses %}
+                <tr>
+                    <td>{{address}}</td>
+                    <td><a href="{% url 'view_address' address.id %}" class="btn btn-outline-dark btn-sm">Alterar
+                            endereço</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+            <div class="d-flex justify-content-end">
+                <a class="btn btn-lg btn-dark" href="{% url 'register_address' %}">
+                    CADASTRAR NOVO ENDEREÇO
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

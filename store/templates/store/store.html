@@ -1,0 +1,117 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+
+
+<div class="carousel fade-carousel slide mt-n3 ml-n2 mr-n2" data-ride="carousel" id="bs-carousel">
+    <!-- Overlay -->
+    <div class="overlay"></div>
+
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner">
+        <div class="item slides active">
+            <div class="slide-1"></div>
+            <div class="hero">
+                <hgroup>
+                    <h2>Simplesmente a melhor pasta de amendoim da história da Humanidade!</h2>
+                </hgroup>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row d-flex justify-content-around mt-5 mb-5">
+    <div class="box-advantages">
+        <div class="d-flex justify-content-center">
+            <i class="fas fa-shipping-fast fa-2x"></i>
+            <h6 class="my-auto ml-2">Entregamos em todo o Brasil</h6>
+        </div>
+    </div>
+    <div class="box-advantages">
+        <div class="d-flex justify-content-center">
+            <i class="fas fa-credit-card fa-2x"></i>
+            <h6 class="my-auto ml-2">Em até 6x sem juros</h6>
+        </div>
+    </div>
+    <div class="box-advantages">
+        <div class="d-flex justify-content-center">
+            <i class="fas fa-hand-holding-usd fa-2x"></i>
+            <h6 class="my-auto ml-2">Desconto em pagamento à vista</h6>
+        </div>
+    </div>
+    <div class="box-advantages">
+        <div class="d-flex justify-content-center">
+            <i class="fas fa-lock fa-2x"></i>
+            <h6 class="my-auto ml-2">Compre com segurança</h6>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        {% for product in products %}
+        <div class="col-lg-3 mb-5">
+            <div class="card">
+                <a href="{% url 'view_product' product.id %}"><img class="card-img" src="{{product.image_url}}"></a>
+                <div class="card-body">
+                    <h4 class="card-title text-center">Helga's</h4>
+                    <h4 class="card-title text-center">{{product.name|remove_brand_name}}</h4>
+                    <hr>
+                    <div class="text-center">
+                        <h4 class="text-success">
+                            R${{product.price|floatformat:2|dot_to_comma}}</h4>
+                        <p class="fs-90 mb-0">
+                            em até 6x sem juros de
+                            R${{product.installments_without_interests|get_last_dict_value|floatformat:2|dot_to_comma}}
+                        </p>
+                        <small>ou
+                            R${{product.cash_price|floatformat:2|dot_to_comma}}
+                            à vista</small>
+                        <div class="row justify-content-between mt-3 buy-product">
+                            <button data-product={{product.id}} data-action="add"
+                                class="btn btn-success add-btn btn-sm update-cart"><i
+                                    class="fas fa-shopping-cart mr-2"></i>Comprar
+                            </button>
+                            <div class="quantity">
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <button class="btn btn-outline-secondary" type="button"
+                                            onclick="changeQuantity({{product.id}}, 'subtract')"><strong>-</strong></button>
+                                    </div>
+                                    <input id="product-quantity-{{product.id}}" type="text"
+                                        class="form-control text-center" value="1" data-mask="00" />
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button"
+                                            onclick="changeQuantity({{product.id}}, 'add')"><strong>+</strong></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function changeQuantity(productId, action) {
+        var product = document.getElementById("product-quantity-" + productId)
+        if (action == "add") {
+            if (product.value == "99") {
+                return false
+            }
+            product.value = Number(product.value) + 1
+        }
+        if (action == "subtract") {
+            if (product.value == "1") {
+                return false
+            }
+            product.value = Number(product.value) - 1
+        }
+    }
+</script>
+
+{% endblock content %}

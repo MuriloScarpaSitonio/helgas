@@ -1,0 +1,299 @@
+body{
+	background-color: hsl(0, 0%, 98%);
+}
+
+h1, h2, h3, h4, h5, h6{
+	color:hsl(0, 0%, 30%);
+}
+
+.box-element{
+	box-shadow:hsl(0, 0%, 80%) 0 0 16px;
+	border-radius: 4px;
+	padding: 10px;
+}
+
+.box-advantages {
+	box-shadow:hsl(0, 0%, 80%) 0 0 16px;
+	border-radius: 40px;
+	padding: 10px;
+	width: 300px;
+}
+
+.box-advantages i {
+	color: #28a745;
+}
+
+.buy-product > *{
+	text-align: center;
+	padding: 0px;
+
+}
+
+.thumbnail{
+	width: 100%;
+	height: 200px;
+	-webkit-box-shadow: -1px -3px 5px -2px rgba(214,214,214,1);
+    -moz-box-shadow: -1px -3px 5px -2px rgba(214,214,214,1);
+    box-shadow: -1px -3px 5px -2px rgba(214,214,214,1);
+}
+
+
+.bg-white{
+	background-color: #ececec!important;
+	border-bottom:1px solid #969595;
+}
+
+#cart-icon{
+	width:25px;
+	display: inline-block;
+	margin-left: 15px;
+}
+
+#cart-total{
+	display: block;
+	text-align: center;
+	color:#fff;
+	background-color: rgb(66, 168, 53);
+	width: 20px;
+	height: 25px;
+	border-radius: 50%;
+	font-size: 14px;
+}
+
+.col-lg-4, .col-lg-6, .col-lg-8, .col-lg-12{
+	margin-top: 10px;
+}
+
+
+
+.row-img{
+	width: 100px;
+}
+
+.quantity{
+	width: 105px;
+}
+
+.hidden{
+	display: none!important;
+}
+
+.scrollable-menu {
+    height: auto;
+    max-height: 600px;
+    overflow-x: hidden;
+}
+
+
+.login-card {
+	width: 400px;
+	background: #ececec;
+	border: 1px solid #969595;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	-webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	-moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	border-radius: 10px;
+}
+
+
+.input-group-text {
+	background: #f7ba5b !important;
+	color: white !important;
+	border: 0 !important;
+	border-radius: 0.25rem 0 0 0.25rem !important;
+}
+
+#images-wrapper{
+	margin-top: 30px;
+	max-width: 500px;
+	display: flex;
+	min-height: 100px;
+	align-items: center;
+}
+
+
+.thumbnails {
+	object-fit: cover;
+	max-width: 180px;
+	max-height: 100px;
+	cursor: pointer;
+	opacity: 0.5;
+	margin: 5px;
+	border: 1px solid black;
+
+}
+
+.thumbnails:hover{
+	opacity: 1;
+}
+
+.thumbnails.active{
+	opacity: 1;
+}
+
+
+
+#featured{
+	max-width: 500px;
+	height: 300px;
+}
+
+
+.dataTables_wrapper .dataTables_paginate .paginate_button{
+	border-radius: 10px!important;
+	padding: 8px!important;
+	background-color: transparent;
+}
+
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+	border: 1px solid #c0c3c5!important;
+	border-radius: 10px;
+    background-color: #c0c3c5!important;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #c0c3c5), color-stop(100%, #c0c3c5))!important;
+    background: -webkit-linear-gradient(top, #c0c3c5 0%, #c0c3c5 100%)!important;
+    background: -moz-linear-gradient(top, #c0c3c5 0%, #c0c3c5 100%)!important;
+    background: -ms-linear-gradient(top, #c0c3c5 0%, #c0c3c5 100%)!important;
+    background: -o-linear-gradient(top, #c0c3c5 0%, #c0c3c5 100%)!important;
+	background: linear-gradient(to bottom, #c0c3c5 0%, #c0c3c5 100%)!important;
+}
+
+.fs-70 {
+	font-size: 70%;
+}
+
+.fs-75 {
+	font-size: 75%;
+}
+
+.fs-85 {
+	font-size: 85%;
+}
+
+.fs-90 {
+	font-size: 90%;
+}
+
+.ml-n38 {
+	margin-left: -38px;
+}
+
+.buy-product .btn-success {
+	width: 130px;
+}
+
+#footer {
+	background-color: #ececec;
+}
+
+.black {
+	color: black;
+}
+
+.card-img {
+	height: 250px;
+}
+
+.user-menu {
+	float: left;
+}
+
+.user-menu a {
+	color: rgb(100, 100, 100);
+}
+
+
+.gboro-border {
+	border: 0.5px solid gainsboro;
+}
+
+#payment {
+	height: 200px;
+}
+
+.no-order {
+	margin-bottom: 200px;
+}
+
+
+#product-price {
+	font-size: 200%;
+}
+
+#product-discount {
+	font-size: 130%;
+}
+
+#installments {
+	color: rgb(100, 100, 100);
+}
+
+#bank-slip-img{
+	height: 30px;
+}
+
+.bank-slip-link {
+	font-size: 5%;
+}
+
+.step {
+	text-align: center;
+}
+
+.step.active > * {
+	color: #28a745;
+}
+
+.fade-carousel {
+    position: relative;
+    height: 50vh;
+}
+.fade-carousel .carousel-inner .item {
+    height: 50vh;
+}
+
+.hero {
+	position: absolute;
+	width: 100%;
+    top: 50%;
+    left: 50%;
+    z-index: 3;
+    color: #fff;
+    text-align: center;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 0 rgba(0,0,0,.75);
+      -webkit-transform: translate3d(-50%,-50%,0);
+         -moz-transform: translate3d(-50%,-50%,0);
+          -ms-transform: translate3d(-50%,-50%,0);
+           -o-transform: translate3d(-50%,-50%,0);
+              transform: translate3d(-50%,-50%,0);
+}
+.hero h2 {
+    font-size: 2em;    
+    font-weight: bold;
+    margin: 0;
+	padding: 0;
+	color: gainsboro;
+}
+
+
+.overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    background-color: #080d15;
+    opacity: .3;
+}
+
+.fade-carousel .slides .slide-1 {
+  height: 100vh;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+.fade-carousel .slides .slide-1 {
+	background-image: url(https://images.unsplash.com/photo-1549978113-29eb25c8177f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80); 
+  }
+
+

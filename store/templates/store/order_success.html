@@ -1,0 +1,97 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+
+<div class="container-fluid">
+    {% if requested_order %}
+    <h1 class="text-center">Pedido realizado com sucesso!</h1>
+    <hr>
+    <div class="row">
+        <div class="col-lg-4">
+            <h4 class="text-center">Resumo do pedido</h4>
+            <hr>
+            {% for item in requested_items %}
+            <div class="row p-1">
+                <div class="col-sm-4">
+                    <a href="{% url 'view_product' item.product.id %}"><img class="row-img"
+                            src="{{item.product.image_url}}"></a>
+                </div>
+                <div class="col-sm-8">
+                    <strong>{{item.product.name}}</strong>
+                    <h6 class="mb-0 mt-2">Preço: R${{item.product.price|floatformat:2|dot_to_comma}}
+                    </h6>
+                    <h6 class="mb-0">Quantidade: {{item.quantity}}</h6>
+                    <h6 class="mb-0">Total item: R${{item.total|floatformat:2|dot_to_comma}}</h6>
+                </div>
+            </div>
+            {% endfor %}
+            <hr>
+            <div class="d-flex justify-content-between">
+                <div class="d-flex flex-column">
+                    <h6>Subotal: <strong>R${{requested_order.cart_total|floatformat:2|dot_to_comma}}</strong></h6>
+                    <h6>Desconto: <strong>R${{requested_order.discount|floatformat:2|dot_to_comma}}</strong></h6>
+                    <h6>Juros: <strong>R${{requested_order.interests|floatformat:2|dot_to_comma}}</strong></h6>
+                    <h6>Frete: <strong>R${{requested_order.shipping_price|floatformat:2|dot_to_comma}}</strong></h6>
+                </div>
+                <div>
+                    <h5>Total:
+                        <strong>R${{requested_order.payment.total|floatformat:2|dot_to_comma}}</strong></h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <h4 class="text-center">Endereço, frete e pagamento</h4>
+            <hr>
+            <div class="d-flex justify-content-around flex-column">
+                <div>
+                    <h6>Endereço: {{requested_order.shipping_address}}</h6>
+                    <hr>
+                </div>
+                <div>
+                    <h6>Serviço de frete: {{requested_order.shipping_service.get_service_code_display}}</h6>
+                    <h6>Previsão de entrega: <strong>{{requested_order.shipping_service.days_to_deliver}} dias
+                            úteis</strong> após
+                        a postagem da encomenda</h6>
+                    <hr>
+                </div>
+                <div>
+                    <h6>Método de pagamento: {{requested_order.payment.get_payment_type_display}}</h6>
+                    <h6>Quantidade de parcelas: <strong>{{requested_order.payment.number_of_installments}}x</strong>
+                    </h6>
+                    <h6>Valor por parcela:
+                        <strong>R${{requested_order.payment.value_of_installment|floatformat:2|dot_to_comma}}</strong>
+                    </h6>
+                    <hr>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <h4 class="text-center">Acesse suas informações</h4>
+            <hr>
+            <div class="d-flex justify-content-around flex-column align-items-center">
+                <div class="p-2">
+                    <a class="btn btn-secondary btn-lg btn-block" href="{% url 'view_profile'%}" role="button">Meus
+                        dados</a>
+                </div>
+                <div class="p-2">
+                    <a class="btn btn-secondary btn-lg btn-block" href="{% url 'user_page'%}" role="button">Meus
+                        pedidos</a>
+                </div>
+                <div class="p-2">
+                    <a class="btn btn-secondary btn-lg btn-block" href="{% url 'view_all_addresses'%}"
+                        role="button">Meus endereços</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center no-order">
+        <h1>A ordem não existe para o cliente selecionado!</h1>
+    </div>
+    {% endif %}
+</div>
+
+
+
+{% endblock content %}

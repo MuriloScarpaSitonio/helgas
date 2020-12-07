@@ -1,0 +1,236 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+
+<style>
+    span {
+        color: rgb(100, 100, 100);
+    }
+
+    .box-element {
+        background-color: rgb(235, 235, 235);
+    }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div id="img-container" class="text-center">
+                <img id=featured src="{{product.image_url}}">
+            </div>
+            <div id="images-wrapper">
+                <div class="mx-auto">
+                    <img class="thumbnails active" src="{{product.image_url}}">
+                    <img class="thumbnails" src="{{product.nutritional_infos_url}}">
+                </div>
+            </div>
+        </div>
+        <div class="col my-auto">
+            <h1>{{product}}</h1>
+            <hr>
+            <p>
+                <span id="product-price"><strong>R${{product.price|floatformat:2|dot_to_comma}}</strong></span>
+                <span id="product-discount">
+                    - em até 6x sem juros ou R${{product.cash_price|floatformat:2|dot_to_comma}} à vista
+                </span>
+            </p>
+
+            <p>{{product.description}}</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="input-group input-group-lg">
+                        <div class="input-group-prepend">
+                            <button class="btn btn-outline-secondary" type="button"
+                                onclick="changeQuantity({{product.id}}, 'subtract')"><strong>-</strong></button>
+                        </div>
+                        <input id="product-quantity-{{product.id}}" type="text" class="form-control text-center"
+                            value="1" data-mask="00" />
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button"
+                                onclick="changeQuantity({{product.id}}, 'add')"><strong>+</strong></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <button data-product={{product.id}} data-action="add"
+                        class="btn btn-dark add-btn btn-lg update-cart">Comprar</button>
+                </div>
+            </div>
+            <div class="box-element mt-4">
+                <div class="row justify-content-between">
+                    <div class="ml-3">
+                        <i class="fab fa-cc-visa"></i>
+                        <i class="fab fa-cc-mastercard ml-1"></i>
+                        <i class="fab fa-cc-amex ml-1"></i>
+                        <i class="fab fa-cc-paypal ml-1"></i>
+                    </div>
+                    <button id="installments" class="btn btn-link btn-sm mr-2" type="button" data-toggle="collapse"
+                        data-target="#collapseInstallments" aria-expanded="false" aria-controls="collapseInstallments">
+                        <strong>Parcelas &#8595;</strong>
+                    </button>
+                </div>
+                <hr>
+                <div class="collapse" id="collapseInstallments">
+                    <div class="row">
+                        <div class="col">
+                            <ul>
+                                {% for n_installments, p_installments in product.installments_without_interests.items %}
+                                <p>
+                                    <span><strong>{{n_installments}}x </strong></span>
+                                    <span class="fs-85">
+                                        R${{p_installments|floatformat:2|dot_to_comma}}
+                                    </span>
+                                    <span class="fs-70">sem juros</span>
+                                </p>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="col">
+                            <ul>
+                                {% for n_installments, p_installments in product.installments_with_interests.items %}
+                                <p>
+                                    <span><strong>{{n_installments}}x </strong></span>
+                                    <span class="fs-85">
+                                        R${{p_installments|floatformat:2|dot_to_comma}}
+                                    </span>
+                                </p>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+                <div class="row justify-content-between">
+                    <div>
+                        <img id="bank-slip-img" class="ml-3 mt-n1"
+                            src="https://img.icons8.com/color/48/000000/boleto-bankario.png" />
+                    </div>
+                    <strong>
+                        <span class="mr-3">
+                            R${{product.cash_price|floatformat:2|dot_to_comma}}
+                        </span>
+                    </strong>
+                </div>
+            </div>
+            <div class="mt-4">
+                <h6>Calcular frete e prazo:</h6>
+                <form onsubmit="return false">
+                    <div class="form-inline">
+                        <input id="zip_code" class="form-control-sm form-control" type="text" placeholder="CEP"
+                            data-mask="00000-000">
+                        <button id="get_shipping_infos" class="btn btn-dark btn-sm ml-2" type="submit">Calcular</button>
+                    </div>
+                </form>
+                <br>
+                <table class="table table-striped hidden" id="tableShippingInfos">
+                    <thead>
+                        <tr>
+                            <th scope="col">Serviço</th>
+                            <th scope="col">Preço</th>
+                            <th scope="col">Prazo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>PAC</td>
+                            <td id="price_04510"></td>
+                            <td id="deadline_04510"></td>
+                        </tr>
+                        <tr>
+                            <td>SEDEX</td>
+                            <td id="price_04014"></td>
+                            <td id="deadline_04014"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="d-flex justify-content-start">
+                    <div id="i-loader-shipping-service" class="spinner-border hidden" role="status">
+                    </div>
+                    <small id="shippingInfosLoadingText" class="ml-2 hidden">Obtendo informações de
+                        envio...</small>
+                    <strong>
+                        <p id="shippingInfosError" class="hidden"></p>
+                    </strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-end">
+    <a class="bank-slip-link" href="https://icons8.com/icon/77599/boleto-bankario" target="_blank"
+        rel="noopener noreferrer">
+        Boleto Bankario icon by Icons8</a>
+</div>
+
+<script type="text/javascript" src="{% static 'js/slider.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/jquery.zoom.js' %}"></script>
+
+
+<script>
+    $(document).ready(function () {
+        $('#img-container').zoom()
+    });
+
+    $(".thumbnails").click(function () {
+        $('#img-container').trigger('zoom.destroy')
+        $('#img-container').zoom()
+    })
+</script>
+
+<script>
+    function changeQuantity(productId, action) {
+        var product = document.getElementById("product-quantity-" + productId)
+        if (action == "add") {
+            if (product.value == "99") {
+                return false
+            }
+            product.value = Number(product.value) + 1
+        }
+        if (action == "subtract") {
+            if (product.value == "1") {
+                return false
+            }
+            product.value = Number(product.value) - 1
+        }
+    }
+</script>
+
+<script type="module">
+    import { getShippingInfos, getZipCodeError } from "{% static 'js/utils.js' %}"
+
+    $("#get_shipping_infos").click(function () {
+        var shipping_loader = document.getElementById('i-loader-shipping-service')
+        var shipping_text = document.getElementById('shippingInfosLoadingText')
+        var shipping_error_text = document.getElementById('shippingInfosError')
+
+        shipping_loader.classList.remove('hidden')
+        shipping_text.classList.remove('hidden')
+        shipping_error_text.classList.add('hidden')
+
+        getShippingInfos($("#zip_code").val().replace(/\D/g, ''))
+            .then((shipping_infos) => {
+                shipping_loader.classList.add('hidden')
+                shipping_text.classList.add('hidden')
+                if (shipping_infos.PAC.Erro == 0) {
+                    document.getElementById('price_04510').innerHTML = 'R$' + shipping_infos.PAC.Valor
+                    document.getElementById('deadline_04510').innerHTML = shipping_infos.PAC.PrazoEntrega + ' dias úteis'
+
+                    document.getElementById('price_04014').innerHTML = 'R$' + shipping_infos.SEDEX.Valor
+                    document.getElementById('deadline_04014').innerHTML = shipping_infos.SEDEX.PrazoEntrega + ' dias úteis'
+
+                    document.getElementById("tableShippingInfos").classList.remove('hidden')
+                }
+                else {
+                    document.getElementById("tableShippingInfos").classList.add('hidden')
+                    shipping_error_text.innerHTML = getZipCodeError(shipping_infos.PAC.Erro, shipping_infos.PAC.MsgErro)
+                    shipping_error_text.classList.remove('hidden')
+                }
+            })
+    })
+
+</script>
+
+{% endblock content %}

@@ -1,0 +1,57 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load socialaccount %}
+{% providers_media_js %}
+{% block content %}
+
+<div class="d-flex justify-content-center p-2">
+    <div class="login-card text-center p-4">
+        <h2>LOGIN</h2>
+        <br>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+                <div class="input-group-append">
+                    <span class="input-group-text"><i class="fas fa-at"></i></span>
+                </div>
+                {{authentication_form.username}}
+            </div>
+            <div class="input-group mb-2">
+                <div class="input-group-append">
+                    <span class="input-group-text"><i class="fas fa-key"></i></span>
+                </div>
+                {{authentication_form.password}}
+            </div>
+            <button class="btn btn-block btn-success" type="submit">LOGIN</button>
+        </form>
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible text-center" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                    aria-hidden="true">&times;</span></button>
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        <div class="d-flex justify-content-between">
+            <a class="btn btn-primary btn-sm" href="{% provider_login_url "facebook" method="oauth2" %}"><i
+                    class="fab fa-facebook-f mr-2"></i>Entrar com Facebook</a>
+            <a class="btn btn-danger btn-sm" href="{% url 'google_login' %}"><i class="fab fa-google mr-2"></i>Entrar
+                com
+                Google</a>
+        </div>
+
+        <div class="mt-2">
+            <div class="d-flex justify-content-center links">
+                Ainda não possui uma conta? <a href="{% url 'register' %}" class="ml-1">Registre-se</a>
+            </div>
+            <div class="d-flex justify-content-center links">
+                Esqueceu sua senha? <a href="{% url 'forgot_password' %}" class="ml-1">Clique aqui</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}
